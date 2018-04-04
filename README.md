@@ -30,9 +30,10 @@ uNavINS Filter;
 
 ### Data Collection Functions
 
-**void update(unsigned long TOW,double vn,double ve,double vd,double lat,double lon,double alt,double alt_baro,float p,float q,float r,float ax,float ay,float az,float hx,float hy, float hz)** updates the filter with new IMU, Barometer and GPS measurements, time updates propogate the state and measurement updates are made; the attitude and inertial position and velocity estimates of the vehicle are updated. Inputs are:
+**void update(bool gpsUpdate,bool baroUpdate,double vn,double ve,double vd,double lat,double lon,double alt,double alt_baro,float p,float q,float r,float ax,float ay,float az,float hx,float hy, float hz)** updates the filter with new IMU, Barometer and GPS measurements, time updates propogate the state and measurement updates are made; the attitude and inertial position and velocity estimates of the vehicle are updated. Inputs are:
 
-* unsigned long TOW: GPS time of week. This is used to trigger a measurement update when the GPS data is new (i.e. the TOW has changed).
+* bool gpsUpdate: This is used to trigger a measurement update when new GPS data is available.
+* bool baroUpdate: This is used to trigger a measurement update when new barometer data is available.
 * double vn: GPS velocity in the North direction, units are m/s.
 * double ve: GPS velocity in the East direction, units are m/s.
 * double vd: GPS velocity in the down direction, units are m/s.
