@@ -37,7 +37,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Arduino.h"
 #include "uNavINS.h"
 
-void uNavINS::update(unsigned long TOW,double vn,double ve,double vd,double lat,double lon,double alt,float p,float q,float r,float ax,float ay,float az,float hx,float hy, float hz) {
+void uNavINS::update(unsigned long TOW,double vn,double ve,double vd,double lat,double lon,double alt,double alt_baro,float p,float q,float r,float ax,float ay,float az,float hx,float hy, float hz) {
   if (!initialized) {
     // set the time
     tprev = (float) micros()/1000000.0f;
@@ -65,6 +65,7 @@ void uNavINS::update(unsigned long TOW,double vn,double ve,double vd,double lat,
     grav(2,0) = G;
     // ... H
     H.block(0,0,5,5) = Eigen::Matrix<float,5,5>::Identity();
+    H(6,2) = 1;
     // // ... Rw
     // Rw.block(0,0,3,3) = powf(SIG_W_A,2.0f)*Eigen::Matrix<float,3,3>::Identity();
     // Rw.block(3,3,3,3) = powf(SIG_W_G,2.0f)*Eigen::Matrix<float,3,3>::Identity();
@@ -95,6 +96,7 @@ void uNavINS::update(unsigned long TOW,double vn,double ve,double vd,double lat,
     // ... R
     R(0,0) = SIG_GPS_P_NE*SIG_GPS_P_NE; R(1,1) = SIG_GPS_P_NE*SIG_GPS_P_NE; R(2,2) = SIG_GPS_P_D*SIG_GPS_P_D;
     R(3,3) = SIG_GPS_V*SIG_GPS_V;       R(4,4) = SIG_GPS_V*SIG_GPS_V;       R(5,5) = SIG_GPS_V*SIG_GPS_V;
+    R(6,6) = SIG_BARO_P_D*SIG_BARO_P_D;
     // .. then initialize states with GPS Data
     lat_ins = lat;
     lon_ins = lon;
@@ -205,6 +207,7 @@ void uNavINS::update(unsigned long TOW,double vn,double ve,double vd,double lat,
       y(3,0) = (float)(V_gps(0,0) - V_ins(0,0));
       y(4,0) = (float)(V_gps(1,0) - V_ins(1,0));
       y(5,0) = (float)(V_gps(2,0) - V_ins(2,0));
+      y(6,0) = -(float)(alt_baro - alt_ins);
       // Kalman gain
       K = P*H.transpose()*(H*P*H.transpose() + R).inverse();
       // Covariance update

@@ -50,7 +50,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 class uNavINS {
   public:
-    void update(unsigned long TOW,double vn,double ve,double vd,double lat,double lon,double alt,float p,float q,float r,float ax,float ay,float az,float hx,float hy, float hz);
+    void update(unsigned long TOW,double vn,double ve,double vd,double lat,double lon,double alt,double alt_baro,float p,float q,float r,float ax,float ay,float az,float hx,float hy, float hz);
     float getPitch_rad();
     float getRoll_rad();
     float getYaw_rad();
@@ -87,6 +87,8 @@ class uNavINS {
     // GPS measurement noise std dev (m)
     const float SIG_GPS_P_NE = 3.0f;
     const float SIG_GPS_P_D = 5.0f;
+    // Barometer measurement noise std dev (m)
+    const float SIG_BARO_P_D = 0.5f;
     // GPS measurement noise std dev (m/s)
     const float SIG_GPS_V = 0.5f;
     // Initial set of covariance
@@ -167,14 +169,14 @@ class uNavINS {
     Eigen::Matrix<float,4,1> quat = Eigen::Matrix<float,4,1>::Zero();
     // dquat
     Eigen::Matrix<float,4,1> dq = Eigen::Matrix<float,4,1>::Zero();
-    // difference between GPS and INS
-    Eigen::Matrix<float,6,1> y = Eigen::Matrix<float,6,1>::Zero();
-    // GPS measurement noise
-    Eigen::Matrix<float,6,6> R = Eigen::Matrix<float,6,6>::Zero();
+    // difference between GPS/Barometer and INS
+    Eigen::Matrix<float,7,1> y = Eigen::Matrix<float,7,1>::Zero();
+    // GPS & Barometer measurement noise
+    Eigen::Matrix<float,7,7> R = Eigen::Matrix<float,7,7>::Zero();
     Eigen::Matrix<float,15,1> x = Eigen::Matrix<float,15,1>::Zero();
     // Kalman Gain
-    Eigen::Matrix<float,15,6> K = Eigen::Matrix<float,15,6>::Zero();
-    Eigen::Matrix<float,6,15> H = Eigen::Matrix<float,6,15>::Zero();
+    Eigen::Matrix<float,15,7> K = Eigen::Matrix<float,15,7>::Zero();
+    Eigen::Matrix<float,7,15> H = Eigen::Matrix<float,7,15>::Zero();
     // skew symmetric
     Eigen::Matrix<float,3,3> sk(Eigen::Matrix<float,3,1> w);
     // lla rate
