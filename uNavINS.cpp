@@ -37,7 +37,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Arduino.h"
 #include "uNavINS.h"
 
-void uNavINS::update(unsigned long TOW,double vn,double ve,double vd,double lat,double lon,double alt,double alt_baro,float p,float q,float r,float ax,float ay,float az,float hx,float hy, float hz) {
+void uNavINS::update(bool gpsUpdate,bool baroUpdate,double vn,double ve,double vd,double lat,double lon,double alt,double alt_baro,float p,float q,float r,float ax,float ay,float az,float hx,float hy, float hz) {
   if (!initialized) {
     // set the time
     tprev = (float) micros()/1000000.0f;
@@ -181,8 +181,7 @@ void uNavINS::update(unsigned long TOW,double vn,double ve,double vd,double lat,
     P = 0.5f*(P+P.transpose());
 
     // Gps measurement update
-    if ((TOW - previousTOW) > 0) {
-      previousTOW = TOW;
+    if (gpsUpdate || baroUpdate) {
       lla_gps(0,0) = lat;
       lla_gps(1,0) = lon;
       lla_gps(2,0) = alt;
@@ -201,13 +200,18 @@ void uNavINS::update(unsigned long TOW,double vn,double ve,double vd,double lat,
       pos_ecef_gps = lla2ecef(lla_gps);
       pos_ned_gps = ecef2ned(pos_ecef_gps,lla_ins);
       // Create measurement Y
-      y(0,0) = (float)(pos_ned_gps(0,0) - pos_ned_ins(0,0));
-      y(1,0) = (float)(pos_ned_gps(1,0) - pos_ned_ins(1,0));
-      y(2,0) = (float)(pos_ned_gps(2,0) - pos_ned_ins(2,0));
-      y(3,0) = (float)(V_gps(0,0) - V_ins(0,0));
-      y(4,0) = (float)(V_gps(1,0) - V_ins(1,0));
-      y(5,0) = (float)(V_gps(2,0) - V_ins(2,0));
-      y(6,0) = -(float)(alt_baro - alt_ins);
+      y.setZero();
+      if (gpsUpdate) {
+        y(0,0) = (float)(pos_ned_gps(0,0) - pos_ned_ins(0,0));
+        y(1,0) = (float)(pos_ned_gps(1,0) - pos_ned_ins(1,0));
+        y(2,0) = (float)(pos_ned_gps(2,0) - pos_ned_ins(2,0));
+        y(3,0) = (float)(V_gps(0,0) - V_ins(0,0));
+        y(4,0) = (float)(V_gps(1,0) - V_ins(1,0));
+        y(5,0) = (float)(V_gps(2,0) - V_ins(2,0));
+      }
+      if (baroUpdate) {
+        y(6,0) = -(float)(alt_baro - alt_ins);
+      }
       // Kalman gain
       K = P*H.transpose()*(H*P*H.transpose() + R).inverse();
       // Covariance update

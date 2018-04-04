@@ -50,7 +50,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 class uNavINS {
   public:
-    void update(unsigned long TOW,double vn,double ve,double vd,double lat,double lon,double alt,double alt_baro,float p,float q,float r,float ax,float ay,float az,float hx,float hy, float hz);
+    void update(bool gpsUpdate,bool baroUpdate,double vn,double ve,double vd,double lat,double lon,double alt,double alt_baro,float p,float q,float r,float ax,float ay,float az,float hx,float hy, float hz);
     float getPitch_rad();
     float getRoll_rad();
     float getYaw_rad();
@@ -108,7 +108,6 @@ class uNavINS {
     bool initialized = false;
     // timing
     float tnow, tprev, dt;
-    unsigned long previousTOW;
     // estimated attitude
     float phi, theta, psi, heading;
     // initial heading angle
