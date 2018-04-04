@@ -15,7 +15,7 @@ XXX - how to tell that solution has converged? How to warm up filter?
 # Usage
 
 ## Installation
-This library requires [Eigen](https://github.com/bolderflight/Eigen) to compile. First download or clone [Eigen](https://github.com/bolderflight/Eigen) into your Arduino/libraries folder, then download or clone this library into your Arduino/libraries folder. Additionally, this library requires IMU measurements and GPS measurements. For the included examples, an [MPU-9250 IMU](https://github.com/bolderflight/MPU9250) is used with a [uBlox GPS](https://github.com/bolderflight/UBLOX), and their libraries will need to be installed as well. 
+This library requires [Eigen](https://github.com/bolderflight/Eigen) to compile. First download or clone [Eigen](https://github.com/bolderflight/Eigen) into your Arduino/libraries folder, then download or clone this library into your Arduino/libraries folder. Additionally, this library requires IMU measurements, barometer altitude measurments and GPS measurements. For the included examples, an [MPU-9250 IMU](https://github.com/bolderflight/MPU9250) is used with a [uBlox GPS](https://github.com/bolderflight/UBLOX) and a [BMP280](https://github.com/adafruit/Adafruit_BMP280_Library), and their libraries will need to be installed as well. 
 
 XXX - Finally, because this library is using accelerometers and magnetometers as a measurement update, the IMU used should be well calibrated.
 
@@ -30,7 +30,7 @@ uNavINS Filter;
 
 ### Data Collection Functions
 
-**void update(unsigned long TOW,double vn,double ve,double vd,double lat,double lon,double alt,float p,float q,float r,float ax,float ay,float az,float hx,float hy, float hz)** updates the filter with new IMU and GPS measurements, time updates propogate the state and measurement updates are made; the attitude and inertial position and velocity estimates of the vehicle are updated. Inputs are:
+**void update(unsigned long TOW,double vn,double ve,double vd,double lat,double lon,double alt,double alt_baro,float p,float q,float r,float ax,float ay,float az,float hx,float hy, float hz)** updates the filter with new IMU, Barometer and GPS measurements, time updates propogate the state and measurement updates are made; the attitude and inertial position and velocity estimates of the vehicle are updated. Inputs are:
 
 * unsigned long TOW: GPS time of week. This is used to trigger a measurement update when the GPS data is new (i.e. the TOW has changed).
 * double vn: GPS velocity in the North direction, units are m/s.
@@ -39,6 +39,7 @@ uNavINS Filter;
 * double lat: GPS measured latitude, units are rad.
 * double lon: GPS measured longitude, units are rad.
 * double alt: GPS measured altitude, units are m.
+* double alt_baro: Barometer measured altitude, units are m.
 * float p: gyro measurement in the x direction, units are rad/s.
 * float q: gyro measurement in the y direction, units are rad/s.
 * float r: gyro measurement in the z direction, units are rad/s.
@@ -55,7 +56,7 @@ Please note that IMU measurements need to be given in the [defined axis system](
 // read the sensor
 Imu.readSensor();
 // update the filter
-Filter.update(uBloxData.iTOW,uBloxData.velN,uBloxData.velE,uBloxData.velD,uBloxData.lat*PI/180.0f,uBloxData.lon*PI/180.0f,uBloxData.hMSL,Imu.getGyroY_rads(),-1*Imu.getGyroX_rads(),Imu.getGyroZ_rads(),Imu.getAccelY_mss(),-1*Imu.getAccelX_mss(),Imu.getAccelZ_mss(),Imu.getMagX_uT(),Imu.getMagY_uT(),Imu.getMagZ_uT());
+Filter.update(uBloxData.iTOW,uBloxData.velN,uBloxData.velE,uBloxData.velD,uBloxData.lat*PI/180.0f,uBloxData.lon*PI/180.0f,uBloxData.hMSL,bmp.readAltitude(seaLevelhPa),Imu.getGyroY_rads(),-1*Imu.getGyroX_rads(),Imu.getGyroZ_rads(),Imu.getAccelY_mss(),-1*Imu.getAccelX_mss(),Imu.getAccelZ_mss(),Imu.getMagX_uT(),Imu.getMagY_uT(),Imu.getMagZ_uT());
 ```
 
 **float getRoll_rad()** returns the roll angle in units of rad.
