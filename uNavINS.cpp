@@ -210,7 +210,7 @@ void uNavINS::update(bool gpsUpdate,bool baroUpdate,double vn,double ve,double v
         y(5,0) = (float)(V_gps(2,0) - V_ins(2,0));
       }
       if (baroUpdate) {
-        y(6,0) = -(float)(alt_baro - alt_ins);
+        y(6,0) = -(float)(alt_baro - alt_ins);    // coordinate system with down along positive z axis
       }
       // Kalman gain
       K = P*H.transpose()*(H*P*H.transpose() + R).inverse();
@@ -361,7 +361,7 @@ Eigen::Matrix<double,3,1> uNavINS::llarate(Eigen::Matrix<double,3,1> V,Eigen::Ma
   denom = sqrt(denom*denom);
 
   Rew = EARTH_RADIUS / sqrt(denom);
-  Rns = EARTH_RADIUS*(1.0-ECC2) / denom*sqrt(denom);
+  Rns = EARTH_RADIUS*(1.0-ECC2) / (denom*sqrt(denom));
   
   lla_dot(0,0) = V(0,0)/(Rns + lla(2,0));
   lla_dot(1,0) = V(1,0)/((Rew + lla(2,0))*cos(lla(0,0)));

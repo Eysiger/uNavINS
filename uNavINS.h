@@ -88,7 +88,7 @@ class uNavINS {
     const float SIG_GPS_P_NE = 3.0f;
     const float SIG_GPS_P_D = 5.0f;
     // Barometer measurement noise std dev (m)
-    const float SIG_BARO_P_D = 0.5f;
+    const float SIG_BARO_P_D = 3.0f;
     // GPS measurement noise std dev (m/s)
     const float SIG_GPS_V = 0.5f;
     // Initial set of covariance
